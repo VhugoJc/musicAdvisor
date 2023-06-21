@@ -9,11 +9,16 @@ public enum Variables {
     RESOURCE("https://api.spotify.com"),
     ACCESS_TOKEN(""),
     RESPONSE_TYPE("code"),
+    GRANT_TYPE("authorization_code"),
     PAGE("5")
     ; // API server path
     private String url;
 
     Variables(String url) {
+        this.url = url;
+    }
+
+    public void setUrl(String url) {
         this.url = url;
     }
 

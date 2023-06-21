@@ -10,16 +10,7 @@ import java.util.Scanner;
 @Component
 public class MyRunner implements CommandLineRunner {
     @Autowired
-    NewReleasesService newReleasesService;
-    @Autowired
-    FeaturedService featuredService;
-    @Autowired
-    CategoriesService categoriesService;
-    @Autowired
-    PlayListService playListService;
-    @Autowired
-    AuthService authService;
-
+    SpotifyService spotifyService;
     @Override
     public void run(String... args) throws Exception {
         Scanner scanner = new Scanner(System.in);
@@ -38,20 +29,20 @@ public class MyRunner implements CommandLineRunner {
 
             switch (line){
                 case "new":
-                    this.newReleasesService.printNewReleases();
+                    this.spotifyService.printNewReleases();
                     break;
                 case "featured":
-                    this.featuredService.printFeatured();
+                    this.spotifyService.printFeatured();
                     break;
                 case "categories":
-                    this.categoriesService.printCategories();
+                    this.spotifyService.printCategories();
                     break;
                 case "playlists":
-                    this.playListService.printPlaylist(param);
+                    this.spotifyService.printPlaylist(param);
                     break;
                 case "auth":
-                        this.authService.initAuth();
-                        break;
+
+                    break;
                case "exit":
                     System.out.println("---GOODBYE!---");
                     break;

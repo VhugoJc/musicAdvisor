@@ -9,13 +9,20 @@ import java.io.IOException;
 @Service
 public class AuthService {
     MainController mainController;
+    private boolean isAuth (){
+        if(Variables.AUTH_CODE.toString().equals("")){
+            return true;
+        }
+        return false;
+    }
     public void initAuth() throws IOException {
-        MainController.MainController();
+        MainController.runServer();
         System.out.println(
                 Variables.ACCESS.toString() +
                 "/authorize?client_id=" + Variables.CLIENT_ID.toString() +
                 "&response_type=" + Variables.RESPONSE_TYPE.toString() +
                 "&redirect_uri=" + Variables.REDIRECT_URI.toString()
         );
+
     }
 }
