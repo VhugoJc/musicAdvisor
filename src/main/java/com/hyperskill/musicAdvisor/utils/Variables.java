@@ -10,21 +10,27 @@ public enum Variables {
     ACCESS_TOKEN(""),
     RESPONSE_TYPE("code"),
     GRANT_TYPE("authorization_code"),
-    PAGE("5")
-    ; // API server path
-    private String url;
+    NEW_URL("https://api.spotify.com/v1/browse/new-releases"),
+    FEATURED_URL("https://api.spotify.com/v1/browse/featured-playlists"),
+    CATEGORIES_URL("https://api.spotify.com/v1/browse/categories"),
+    PLAYLISTS_URL("https://api.spotify.com/v1/browse/categories/%s/playlists"),
 
-    Variables(String url) {
-        this.url = url;
+    PAGE("5")
+
+    ; // API server path
+    private String value;
+
+    Variables(String value) {
+        this.value = value;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setUrl(String value) {
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        return url;
+        return value;
     }
 
 }
