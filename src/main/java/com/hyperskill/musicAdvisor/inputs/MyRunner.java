@@ -11,16 +11,16 @@ import java.util.Scanner;
 public class MyRunner implements CommandLineRunner {
     @Autowired
     SpotifyService spotifyService;
+    @Autowired
+    AuthService authService;
     @Override
     public void run(String... args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         String line = "";
 
         while (!line.equals("exit")){
-
             System.out.print("> ");
             line = scanner.nextLine();
-
             String param = "";
             if(line.split(" ").length >= 2){
                 param = line.split(" ")[1];
@@ -41,7 +41,7 @@ public class MyRunner implements CommandLineRunner {
                     this.spotifyService.printPlaylist(param);
                     break;
                 case "auth":
-
+                    this.authService.initAuth();
                     break;
                case "exit":
                     System.out.println("---GOODBYE!---");
