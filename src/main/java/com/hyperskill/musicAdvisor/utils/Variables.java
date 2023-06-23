@@ -15,7 +15,8 @@ public enum Variables {
     CATEGORIES_URL("https://api.spotify.com/v1/browse/categories"),
     PLAYLISTS_URL("https://api.spotify.com/v1/browse/categories/%s/playlists"),
 
-    PAGE("5")
+    PAGE("1"),
+    PAGE_LIMIT("5")
 
     ; // API server path
     private String value;

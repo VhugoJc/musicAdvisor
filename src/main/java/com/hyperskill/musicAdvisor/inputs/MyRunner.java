@@ -24,13 +24,15 @@ public class MyRunner implements CommandLineRunner {
 
 
     public void run(String... args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
         String line = "";
+
+        Scanner scanner = new Scanner(System.in);
 
         while (!line.equals("exit")){
             System.out.print("> ");
             line = scanner.nextLine();
             String param = "";
+
             if(line.split(" ").length >= 2){
                 param = line.split(" ")[1];
                 line = line.split(" ")[0];
