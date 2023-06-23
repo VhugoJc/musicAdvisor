@@ -1,19 +1,28 @@
 package com.hyperskill.musicAdvisor.inputs;
 
-import com.hyperskill.musicAdvisor.services.*;
+import com.hyperskill.musicAdvisor.controllers.SpotifyController;
+import com.hyperskill.musicAdvisor.models.Category;
+import com.hyperskill.musicAdvisor.models.Playlist;
+import com.hyperskill.musicAdvisor.models.Release;
+import com.hyperskill.musicAdvisor.auth.*;
+import com.hyperskill.musicAdvisor.views.SpotifyView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Scanner;
 
 @Component
 public class MyRunner implements CommandLineRunner {
     @Autowired
-    SpotifyService spotifyService;
+    SpotifyController controller;
+    @Autowired
+    SpotifyView view;
     @Autowired
     AuthService authService;
-    @Override
+
+
     public void run(String... args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         String line = "";
@@ -29,16 +38,20 @@ public class MyRunner implements CommandLineRunner {
 
             switch (line){
                 case "new":
-                    this.spotifyService.printNewReleases();
+                    List<Release> newReleases = controller.getNewReleases();
+                    view.printNewReleases(newReleases);
                     break;
                 case "featured":
-                    this.spotifyService.printFeatured();
+                    List<Playlist> featuredList = controller.getFeatured();
+                    view.printFeatured(featuredList);
                     break;
                 case "categories":
-                    this.spotifyService.printCategories();
+                    List<Category> categories = controller.getCategories();
+                    view.printCategories(categories);
                     break;
                 case "playlists":
-                    this.spotifyService.printPlaylist(param);
+                    List<Playlist> playlistList = controller.getPlaylist(param);
+                    view.printPlayList(playlistList, param);
                     break;
                 case "auth":
                     this.authService.initAuth();
