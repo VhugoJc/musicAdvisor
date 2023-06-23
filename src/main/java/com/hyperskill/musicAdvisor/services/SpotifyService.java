@@ -52,20 +52,36 @@ public class SpotifyService implements StreamingPlatform{
     }
 
     @Override
-    public void printPlaylist(String category) throws IOException, InterruptedException {
+    public void printPlaylist(String categoryName) throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
             return;
         }
-        List<String> playlistsList = new ArrayList<>();
-        playlistsList.add("Walk Like A Badass");
-        playlistsList.add("Rage Beats");
-        playlistsList.add("Arab Mood Booster");
 
-        System.out.println("---"+category.toUpperCase()+" PLAYLISTS---");
-        for(String playList : playlistsList){
-            System.out.println(playList);
+        JsonObject jsonDataCategory = getJsonData(Variables.CATEGORIES_URL.toString(),0);
+        JsonObject allCategories = jsonDataCategory.getAsJsonObject("categories");
+        List<String> id = new ArrayList<>();
+
+        allCategories.get("items").getAsJsonArray().forEach(item -> {
+            var category = item.getAsJsonObject();
+            var name = category.get("name").getAsString();
+            if(categoryName.equals(name)){
+                id.add(category.get("id").getAsString());
+            }
+        });
+        if(id.size()==0){
+            System.out.println("Unknown category name");
+            return;
         }
+        JsonObject jsonData = getJsonData(String.format(Variables.PLAYLISTS_URL.toString(),id.get(0)),0 );
+        JsonObject playLists = jsonData.get("playlists").getAsJsonObject();
+
+        System.out.println("---" + categoryName.toUpperCase() + "PLAYLIST ---");
+        playLists.get("items").getAsJsonArray().forEach(item->{
+            var song = item.getAsJsonObject();
+            System.out.println(song.get("name").getAsString());
+            System.out.println(song.get("external_urls").getAsJsonObject().get("spotify").getAsString());
+        });
     }
 
     @Override
@@ -82,11 +98,12 @@ public class SpotifyService implements StreamingPlatform{
             var album = item.getAsJsonObject();
             System.out.println(album.get("name").getAsString());
             List<String> artists = new ArrayList<>();
+            String url = "";
             album.get("artists").getAsJsonArray().forEach(item2 -> {
                 artists.add(item2.getAsJsonObject().get("name").getAsString());
             });
             System.out.println(artists);
-            System.out.println(album.get("href").getAsString());
+            System.out.println(album.get("external_urls").getAsJsonObject().get("spotify").getAsString());
 
         });
 
@@ -99,9 +116,15 @@ public class SpotifyService implements StreamingPlatform{
             System.out.println("Please, provide access for application.");
             return;
         }
-        JsonObject jsonData = getJsonData(Variables.NEW_URL.toString().toString(),0);
+        JsonObject jsonData = getJsonData(Variables.FEATURED_URL.toString().toString(),0);
         System.out.println(jsonData);
+        JsonObject featured = jsonData.get("playlists").getAsJsonObject();
         System.out.println("---FEATURED---");
+        featured.get("items").getAsJsonArray().forEach(item->{
+            var playlist = item.getAsJsonObject();
+            System.out.println(playlist.get("name").getAsString());
+            System.out.println(playlist.get("external_urls").getAsJsonObject().get("spotify").getAsString());
+        });
 
     }
 
