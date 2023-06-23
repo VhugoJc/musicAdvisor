@@ -1,4 +1,4 @@
-package com.hyperskill.musicAdvisor.services;
+package com.hyperskill.musicAdvisor.auth;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CountDownLatch;
 
 @Service
 public class AuthService {
@@ -50,24 +51,17 @@ public class AuthService {
     }
 
     public void generateAuthCode() throws IOException, InterruptedException {
-        runServer();
         System.out.println(
                 Variables.ACCESS.toString() +
                         "/authorize?client_id=" + Variables.CLIENT_ID.toString() +
                         "&response_type=" + Variables.RESPONSE_TYPE.toString() +
                         "&redirect_uri=" + Variables.REDIRECT_URI.toString()
         );
+        runServer();
     }
     public boolean isAuth () throws IOException, InterruptedException {
-        if(!Variables.ACCESS_TOKEN.toString().equals("")){
-            return true;
-        }
-        if(!Variables.AUTH_CODE.toString().equals("")){
-            this.generatedAccessToken();
-        }
-
-        if(Variables.ACCESS_TOKEN.toString().equals("")){
-           return false;
+        if(Variables.AUTH_CODE.toString().equals("") || Variables.ACCESS_TOKEN.toString().equals("")){
+            return false;
         }
         return true;
     }
@@ -86,12 +80,14 @@ public class AuthService {
 
 
     public void runServer() throws IOException, InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/", exchange -> {
             String query = exchange.getRequestURI().getQuery();
             String responseBody = "something went wrong";
 
             if (query != null && query.contains("code")) {
+                latch.countDown();
                 Variables.AUTH_CODE.setUrl(query.substring(5));//code=
                 try {
                     this.generatedAccessToken();
@@ -100,13 +96,15 @@ public class AuthService {
                 }
                 responseBody = "Got the code. Return back to your program.";
             } else {
+                latch.countDown();
                 responseBody = "Not found authorization code. Try again.";
             }
             exchange.sendResponseHeaders(200, responseBody.length());
             exchange.getResponseBody().write(responseBody.getBytes());
             exchange.getResponseBody().close();
         });
-        server.setExecutor(null); // creates a default executor
         server.start();
+        latch.await();
+        server.stop(10);
     }
 }
