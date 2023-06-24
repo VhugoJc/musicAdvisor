@@ -7,6 +7,7 @@ import com.hyperskill.musicAdvisor.models.Playlist;
 import com.hyperskill.musicAdvisor.models.Release;
 import com.hyperskill.musicAdvisor.auth.AuthService;
 import com.hyperskill.musicAdvisor.utils.Variables;
+import com.hyperskill.musicAdvisor.views.SpotifyView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -22,6 +23,8 @@ import java.util.List;
 public class SpotifyController implements StreamingController{
     @Autowired
     AuthService authService;
+    @Autowired
+    SpotifyView view;
 
     public static JsonObject getJsonData(String url, int limit) throws IOException, InterruptedException {
         String query = limit!=0 ?"?limit=" + limit :"";
@@ -35,29 +38,41 @@ public class SpotifyController implements StreamingController{
         return JsonParser.parseString(response.body()).getAsJsonObject();
     }
     @Override
-    public List<Category> getCategories() throws IOException, InterruptedException {
+    public void getCategories() throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
-            return null;
+            return;
         }
         List<Category> categoryList = new ArrayList<>();
 
         JsonObject jsonData = getJsonData(Variables.CATEGORIES_URL.toString(),0);
         JsonObject allCategories = jsonData.getAsJsonObject("categories");
         allCategories.get("items").getAsJsonArray().forEach(item -> {
-            Category category = new Category(item.getAsJsonObject().get("id").getAsString(),item.getAsJsonObject().get("name").getAsString());
-            categoryList.add(category);
+            if(!item.isJsonNull()){
+                Category category = new Category(item.getAsJsonObject().get("id").getAsString(),item.getAsJsonObject().get("name").getAsString());
+                categoryList.add(category);
+            }
         });
-        return categoryList;
+        this.view.printCategories(categoryList);
     }
 
     @Override
-    public List<Playlist> getPlaylist(String categoryName) throws IOException, InterruptedException {
+    public void getPlaylist(String categoryName) throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
-            return null;
+            return;
         }
-        List<Category> categoryList = new ArrayList<>(getCategories());
+        List<Category> categoryList = new ArrayList<>();
+
+        JsonObject jsonData = getJsonData(Variables.CATEGORIES_URL.toString(),0);
+        JsonObject allCategories = jsonData.getAsJsonObject("categories");
+        allCategories.get("items").getAsJsonArray().forEach(item -> {
+            if(!item.isJsonNull()){
+                Category category = new Category(item.getAsJsonObject().get("id").getAsString(),item.getAsJsonObject().get("name").getAsString());
+                categoryList.add(category);
+            }
+        });
+
         List<Playlist> playlistList = new ArrayList<>();
         List<String> id = new ArrayList<>();
 
@@ -68,25 +83,26 @@ public class SpotifyController implements StreamingController{
         });
         if (id.size()==0){
             System.out.println("Unknown category name");
-            return null;
+            return;
         }
-        JsonObject jsonData = getJsonData(String.format(Variables.PLAYLISTS_URL.toString(),id.get(0)),0 );
-        JsonObject playLists = jsonData.get("playlists").getAsJsonObject();
+        JsonObject jsonDataPL = getJsonData(String.format(Variables.PLAYLISTS_URL.toString(),id.get(0)),0 );
+        JsonObject playLists = jsonDataPL.get("playlists").getAsJsonObject();
 
         playLists.get("items").getAsJsonArray().forEach(item->{
-            var song = item.getAsJsonObject();
-            Playlist playlist = new Playlist(song.get("name").getAsString(),song.get("external_urls").getAsJsonObject().get("spotify").getAsString());
-            playlistList.add(playlist);
+            if(!item.isJsonNull()){
+                var song = item.getAsJsonObject();
+                Playlist playlist = new Playlist(song.get("name").getAsString(),song.get("external_urls").getAsJsonObject().get("spotify").getAsString());
+                playlistList.add(playlist);
+            }
         });
-
-        return playlistList;
+        this.view.printPlayList(playlistList,categoryName);
     }
 
     @Override
-    public List<Release> getNewReleases() throws IOException, InterruptedException {
+    public void getNewReleases() throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
-            return null;
+            return;
         }
         List<Release> releaseList = new ArrayList<>();
 
@@ -95,33 +111,37 @@ public class SpotifyController implements StreamingController{
 
 
         newReleases.get("items").getAsJsonArray().forEach(item -> {
-            var album = item.getAsJsonObject();
-            List<String> artists = new ArrayList<>();
+            if(!item.isJsonNull()){
+                var album = item.getAsJsonObject();
+                List<String> artists = new ArrayList<>();
 
-            album.get("artists").getAsJsonArray().forEach(item2 -> {
-                artists.add(item2.getAsJsonObject().get("name").getAsString());
-            });
-            Release newRelease = new Release(album.get("name").getAsString(), artists, album.get("external_urls").getAsJsonObject().get("spotify").getAsString());
-            releaseList.add(newRelease);
+                album.get("artists").getAsJsonArray().forEach(item2 -> {
+                    artists.add(item2.getAsJsonObject().get("name").getAsString());
+                });
+                Release newRelease = new Release(album.get("name").getAsString(), artists, album.get("external_urls").getAsJsonObject().get("spotify").getAsString());
+                releaseList.add(newRelease);
+            }
         });
-        return releaseList;
+        this.view.printNewReleases(releaseList);
     }
 
     @Override
-    public List<Playlist> getFeatured() throws IOException, InterruptedException {
+    public void getFeatured() throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
-            return null;
+            return;
         }
         JsonObject jsonData = getJsonData(Variables.FEATURED_URL.toString().toString(),0);
         JsonObject featured = jsonData.get("playlists").getAsJsonObject();
         List<Playlist> featuredList = new ArrayList<>();
 
         featured.get("items").getAsJsonArray().forEach(item->{
-            var playlist = item.getAsJsonObject();
-            Playlist newPlaylist = new Playlist(playlist.get("name").getAsString(),playlist.get("external_urls").getAsJsonObject().get("spotify").getAsString());
-            featuredList.add(newPlaylist);
+            if(!item.isJsonNull()){
+                var playlist = item.getAsJsonObject();
+                Playlist newPlaylist = new Playlist(playlist.get("name").getAsString(),playlist.get("external_urls").getAsJsonObject().get("spotify").getAsString());
+                featuredList.add(newPlaylist);
+            }
         });
-        return featuredList;
+        this.view.printFeatured(featuredList);
     }
 }

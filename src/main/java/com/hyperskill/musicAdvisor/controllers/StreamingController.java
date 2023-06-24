@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface StreamingController {
-    public List<Category> getCategories() throws IOException, InterruptedException;
-    public List<Playlist> getPlaylist(String category) throws IOException, InterruptedException;
-    public List<Release> getNewReleases() throws IOException, InterruptedException;
-    public List<Playlist> getFeatured() throws IOException, InterruptedException;
+    public void getCategories() throws IOException, InterruptedException;
+    public void getPlaylist(String category) throws IOException, InterruptedException;
+    public void getNewReleases() throws IOException, InterruptedException;
+    public void getFeatured() throws IOException, InterruptedException;
 }
