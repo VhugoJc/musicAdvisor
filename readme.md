@@ -27,8 +27,11 @@ cd musicAdvisor
 3. Obtain API credentials:
 Visit the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and create a new application to obtain your client ID and client secret.
 Set the following environment variables with your credentials:
+
 `SPOTIFY_CLIENT_ID`: Your Spotify application's client ID.
+
 `SPOTIFY_CLIENT_SECRET`: Your Spotify application's client secret.
+
 4. Run the application:
 ```bash
 mvn spring-boot:run
@@ -38,13 +41,19 @@ The application will run in the console.
 ## Usage
 Once the application is running, you can interact with it using the console. The application provides the following commands:
 
-`auth`: Authenticates with Spotify (you will need to authorize the application with your Spotify account).
-`featured`: Displays a list of Spotify's featured playlists.
-`new`: Displays a list of new album releases.
-`categories`: Displays a list of available categories on Spotify.
-`playlists` <category_name>: Displays a list of playlists in the specified category.
-`exit`: Exits the application.
-To use a command, simply type it in the console and press Enter. Follow the prompts and instructions to navigate through the application.
+ `auth`: Authenticates with Spotify (you will need to authorize the application with your Spotify account).
+ 
+ `featured`: Displays a list of Spotify's featured playlists.
+ 
+ `new`: Displays a list of new album releases.
+ 
+ `categories`: Displays a list of available categories on Spotify.
+
+ `playlists` <category_name>: Displays a list of playlists in the specified category.
+
+ `exit`: Exits the application.
+
+ To use a command, simply type it in the console and press Enter. Follow the prompts and instructions to navigate through the application.
 
 ## Features
 - Authenticate with Spotify to access personalized recommendations.
