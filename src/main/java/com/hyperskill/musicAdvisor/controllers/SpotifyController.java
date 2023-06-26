@@ -26,6 +26,7 @@ public class SpotifyController implements StreamingController{
     @Autowired
     SpotifyView view;
 
+    // Utility method to retrieve JSON data from a specified URL with an optional limit.
     public static JsonObject getJsonData(String url, int limit) throws IOException, InterruptedException {
         String query = limit!=0 ?"?limit=" + limit :"";
         HttpRequest request = HttpRequest.newBuilder()
@@ -37,16 +38,20 @@ public class SpotifyController implements StreamingController{
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return JsonParser.parseString(response.body()).getAsJsonObject();
     }
+
     @Override
+    //Retrieves the categories from Spotify and prints them.
     public void getCategories() throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
             return;
         }
         List<Category> categoryList = new ArrayList<>();
-
+        // Retrieve JSON data from Spotify.
         JsonObject jsonData = getJsonData(Variables.CATEGORIES_URL.toString(),0);
         JsonObject allCategories = jsonData.getAsJsonObject("categories");
+
+        // transform JSON to model
         allCategories.get("items").getAsJsonArray().forEach(item -> {
             if(!item.isJsonNull()){
                 Category category = new Category(item.getAsJsonObject().get("id").getAsString(),item.getAsJsonObject().get("name").getAsString());
@@ -57,22 +62,24 @@ public class SpotifyController implements StreamingController{
     }
 
     @Override
+    // Retrieves the playlists from a specific category in Spotify and prints them.
     public void getPlaylist(String categoryName) throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
             return;
         }
         List<Category> categoryList = new ArrayList<>();
-
+        // // Retrieve JSON data from Spotify.
         JsonObject jsonData = getJsonData(Variables.CATEGORIES_URL.toString(),0);
         JsonObject allCategories = jsonData.getAsJsonObject("categories");
+
+        // get ID by name
         allCategories.get("items").getAsJsonArray().forEach(item -> {
             if(!item.isJsonNull()){
                 Category category = new Category(item.getAsJsonObject().get("id").getAsString(),item.getAsJsonObject().get("name").getAsString());
                 categoryList.add(category);
             }
         });
-
         List<Playlist> playlistList = new ArrayList<>();
         List<String> id = new ArrayList<>();
 
@@ -85,9 +92,10 @@ public class SpotifyController implements StreamingController{
             System.out.println("Unknown category name");
             return;
         }
+        // Retrieve JSON data from Spotify.
         JsonObject jsonDataPL = getJsonData(String.format(Variables.PLAYLISTS_URL.toString(),id.get(0)),0 );
         JsonObject playLists = jsonDataPL.get("playlists").getAsJsonObject();
-
+        // transform JSON to model
         playLists.get("items").getAsJsonArray().forEach(item->{
             if(!item.isJsonNull()){
                 var song = item.getAsJsonObject();
@@ -99,17 +107,18 @@ public class SpotifyController implements StreamingController{
     }
 
     @Override
+    // Retrieves the new releases from Spotify and prints them.
     public void getNewReleases() throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
             return;
         }
         List<Release> releaseList = new ArrayList<>();
-
+        // Retrieve JSON data from Spotify.
         JsonObject jsonData = getJsonData(Variables.NEW_URL.toString().toString(),0);
         JsonObject newReleases = jsonData.getAsJsonObject("albums");
 
-
+        // transform JSON to model
         newReleases.get("items").getAsJsonArray().forEach(item -> {
             if(!item.isJsonNull()){
                 var album = item.getAsJsonObject();
@@ -126,15 +135,17 @@ public class SpotifyController implements StreamingController{
     }
 
     @Override
+    // Retrieves the featured playlists from Spotify and prints them.
     public void getFeatured() throws IOException, InterruptedException {
         if(!authService.isAuth()){
             System.out.println("Please, provide access for application.");
             return;
         }
+        // Retrieve JSON data from Spotify.
         JsonObject jsonData = getJsonData(Variables.FEATURED_URL.toString().toString(),0);
         JsonObject featured = jsonData.get("playlists").getAsJsonObject();
+        // transform JSON to model
         List<Playlist> featuredList = new ArrayList<>();
-
         featured.get("items").getAsJsonArray().forEach(item->{
             if(!item.isJsonNull()){
                 var playlist = item.getAsJsonObject();

@@ -13,11 +13,44 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CountDownLatch;
-
+// Service class for handling authentication with Spotify.
 @Service
 public class AuthService {
     private static final HttpClient client = HttpClient.newBuilder().build();
 
+    // Initializes the authentication process.
+    public void initAuth() throws IOException, InterruptedException {
+        if(!Variables.AUTH_CODE.toString().equals("")){
+            if(!Variables.ACCESS_TOKEN.toString().equals("")){
+                System.out.println("Authorized"); // if it exists: AUTH_CODE & ACCESS TOKEN
+            }else{
+                this.generatedAccessToken(); // if it exists: AUTH_TOKEN
+            }
+        }else {
+            this.generateAuthCode();// if it does not exist: AUTH_CODE & ACCESS TOKEN
+        }
+    }
+
+    // Checks if the user is authenticated.
+    public boolean isAuth () throws IOException, InterruptedException {
+        if(Variables.AUTH_CODE.toString().equals("") || Variables.ACCESS_TOKEN.toString().equals("")){
+            return false;
+        }
+        return true;
+    }
+
+    //  Generates the authorization code and prints the authorization URL.
+    public void generateAuthCode() throws IOException, InterruptedException {
+        System.out.println(
+                Variables.ACCESS.toString() +
+                        "/authorize?client_id=" + Variables.CLIENT_ID.toString() +
+                        "&response_type=" + Variables.RESPONSE_TYPE.toString() +
+                        "&redirect_uri=" + Variables.REDIRECT_URI.toString()
+        );
+        runServer();
+    }
+
+    //  Generates an access token using the provided authorization code.
     public void generatedAccessToken () throws IOException, InterruptedException {
         if(Variables.AUTH_CODE.toString().equals("")){
             System.out.println("Please, provide access for application.");
@@ -35,6 +68,7 @@ public class AuthService {
         }
 
     }
+    // Sends a POST request to the Spotify API to exchange the authorization code for an access token.
     private static HttpResponse<String> PostAccessTokenApi() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(
@@ -49,36 +83,7 @@ public class AuthService {
 
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
-
-    public void generateAuthCode() throws IOException, InterruptedException {
-        System.out.println(
-                Variables.ACCESS.toString() +
-                        "/authorize?client_id=" + Variables.CLIENT_ID.toString() +
-                        "&response_type=" + Variables.RESPONSE_TYPE.toString() +
-                        "&redirect_uri=" + Variables.REDIRECT_URI.toString()
-        );
-        runServer();
-    }
-    public boolean isAuth () throws IOException, InterruptedException {
-        if(Variables.AUTH_CODE.toString().equals("") || Variables.ACCESS_TOKEN.toString().equals("")){
-            return false;
-        }
-        return true;
-    }
-
-    public void initAuth() throws IOException, InterruptedException {
-        if(!Variables.AUTH_CODE.toString().equals("")){
-            if(!Variables.ACCESS_TOKEN.toString().equals("")){
-                System.out.println("Authorized"); // if it exists: AUTH_CODE & ACCESS TOKEN
-            }else{
-                this.generatedAccessToken(); // if it exists: AUTH_TOKEN
-            }
-        }else {
-            this.generateAuthCode();// if it does not exist: AUTH_CODE & ACCESS TOKEN
-        }
-    }
-
-
+    // run server on port 8080 in order to get the auth code from params
     public void runServer() throws IOException, InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);

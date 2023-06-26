@@ -8,22 +8,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// Implementation of the StreamingView interface for displaying Spotify streaming data.
 @Service
 public class SpotifyView implements StreamingView{
-    //pagination:
+    // Prints the current page number and total number of pages.
     public void printPage(int total){
         int page = Integer.parseInt(Variables.PAGE.toString());
         int totalPages = (int) Math.ceil((double)total / Double.parseDouble(Variables.PAGE_LIMIT.toString()));
         Variables.PAGE_SIZE.setUrl(totalPages+"");
         System.out.println("---PAGE " + page + " OF " + totalPages + "---");
     }
+
+    // Calculates the starting index for the current page.
     public int getIndexFrom(){
         return (Integer.parseInt(Variables.PAGE.toString()) - 1) * Integer.parseInt(Variables.PAGE_LIMIT.toString());
     }
+
+    // Calculates the ending index for the current page.
     public int getIndexTo(int total){
         return Math.min(getIndexFrom() + Integer.parseInt(Variables.PAGE_LIMIT.toString()), total);
     }
-    // prints:
+    // Prints the categories.
     @Override
     public void printCategories(List<Category> categoriesList) {
         if(categoriesList==null){
@@ -40,6 +45,7 @@ public class SpotifyView implements StreamingView{
         this.printPage(size);
     }
 
+    // Prints the playlists for a specific category.
     @Override
     public void printPlayList(List<Playlist> playlistList, String categoryName) {
         if(playlistList==null){
@@ -56,6 +62,7 @@ public class SpotifyView implements StreamingView{
         this.printPage(size);
     }
 
+    // Prints the new releases.
     @Override
     public void printNewReleases(List<Release> releaseList) {
         if(releaseList==null){
@@ -72,6 +79,7 @@ public class SpotifyView implements StreamingView{
         this.printPage(size);
     }
 
+    // Prints the featured playlists.
     @Override
     public void printFeatured(List<Playlist> featuredList) {
         if(featuredList==null){

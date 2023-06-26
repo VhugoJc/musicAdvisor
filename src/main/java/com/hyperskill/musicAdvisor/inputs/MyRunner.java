@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
+// Runs the application and handles user input and commands.
 @Component
 public class MyRunner implements CommandLineRunner {
     @Autowired
@@ -32,10 +33,13 @@ public class MyRunner implements CommandLineRunner {
         String opt = "";
         String param = "";
 
+
+        // Continue running the application until the user enters "exit".
         while (!line.equals("exit")){
             System.out.print("> ");
             line = scanner.nextLine();
 
+            // Parse the command and parameter from the user input.
             if(line.split(" ").length >= 2){
                 param = line.split(" ")[1];
                 line = line.split(" ")[0];
@@ -49,7 +53,7 @@ public class MyRunner implements CommandLineRunner {
                 Variables.PAGE.setUrl("1");
             }
 
-
+            // Handle the user command.
             switch (line){
                 case "new":
                     opt = line;
@@ -85,12 +89,17 @@ public class MyRunner implements CommandLineRunner {
         }
     }
 
+    // Handles the pagination for the results and performs the corresponding action.
     public void pageHandle(String option, boolean isNext, String param) throws IOException, InterruptedException {
         int page = Integer.parseInt(Variables.PAGE.toString());
         int page_size = Integer.parseInt(Variables.PAGE_SIZE.toString());
+
+        // Check if the option and parameter are valid.
         if(option.equals("") || param.equals("") && option.equals("playlists")){ // if the option does not exist or the opton is playlists without params
             return;
         }
+
+        // Update the page number based on the navigation direction.
         if(isNext){
             if(page+1<=page_size){
                 Variables.PAGE.setUrl((page+1)+"");
@@ -106,6 +115,8 @@ public class MyRunner implements CommandLineRunner {
                 return;
             }
         }
+
+        // Perform the corresponding action based on the option.
         switch (option){
             case "new":
                 controller.getNewReleases();
