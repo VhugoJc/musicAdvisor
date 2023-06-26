@@ -2,15 +2,6 @@
 
 Welcome to Music Advisor! This project is a music advisor application built using Spring Boot, Java Gson, and Maven. It interacts with the Spotify API and operates in the console environment. With Music Advisor, you can explore music genres, get recommendations, and discover new songs, albums, and playlists based on your preferences.
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Technologies](#technologies)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Installation
 
 To set up and run the Music Advisor application locally, please follow these steps:
